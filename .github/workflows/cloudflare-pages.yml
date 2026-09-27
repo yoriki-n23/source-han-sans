@@ -1,8 +1,8 @@
 name: Deploy web fonts to Cloudflare Pages
 
+# Manual fallback. Normal deploys use Cloudflare Pages' Git integration
+# (see webfonts/README.md), which needs no API token.
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 permissions:

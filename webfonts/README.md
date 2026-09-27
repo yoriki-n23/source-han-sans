@@ -15,15 +15,26 @@ WEIGHTS="Regular Bold" webfonts/build.sh   # ウェイトを絞る場合
 python3 -m http.server -d dist/site        # http://localhost:8000 で確認
 ```
 
-## Cloudflare Pages へのデプロイ（GitHub Actions）
+## Cloudflare Pages へのデプロイ
 
-1. Cloudflare ダッシュボードで API トークンを作成（テンプレートなしのカスタムトークンで、権限は **Account › Cloudflare Pages › Edit** のみ）
-2. GitHub リポジトリの Settings › Secrets and variables › Actions に登録
-   - `CLOUDFLARE_API_TOKEN`
-   - `CLOUDFLARE_ACCOUNT_ID`（ダッシュボード右側の「Account ID」）
-3. `master` に push、または Actions タブから「Deploy web fonts to Cloudflare Pages」を手動実行
+### 通常：Git 連携（APIトークン不要）
 
-初回実行時に Pages プロジェクト `source-han-sans` が自動作成され、`https://source-han-sans.pages.dev/` で公開されます。シークレットが未設定の場合、デプロイはスキップされます（ビルドだけ実行されます）。
+Cloudflare ダッシュボード › Workers & Pages › 作成 › Pages › Git に接続 で、このリポジトリを選び、次のように設定します。
+
+| 項目 | 値 |
+|---|---|
+| プロジェクト名 | `source-han-sans` |
+| 本番ブランチ | `master` |
+| フレームワーク プリセット | None |
+| ビルドコマンド | `pip install -r webfonts/requirements.txt && webfonts/build.sh` |
+| ビルド出力ディレクトリ | `dist/site` |
+| 環境変数 | `PYTHON_VERSION` = `3.12` |
+
+以後、`master` に push するたびに自動でデプロイされ、`https://source-han-sans.pages.dev/` で公開されます。
+
+### 予備：GitHub Actions（手動実行）
+
+Git 連携が使えない場合は、`CLOUDFLARE_API_TOKEN`（権限は Account › Cloudflare Pages › Edit のみ）と `CLOUDFLARE_ACCOUNT_ID` を GitHub の Settings › Secrets and variables › Actions に登録し、Actions タブから「Deploy web fonts to Cloudflare Pages」を手動実行します。
 
 ## 使い方
 
