@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>源ノ角ゴシック JP Webフォント</title>
+<link rel="stylesheet" href="source-han-sans-jp.css">
+<style>
+  :root { --bg: #fafafa; --fg: #1a1a1a; --muted: #666; --line: #ddd; --code: #f0f0f0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161616; --fg: #eee; --muted: #999; --line: #333; --code: #222; }
+  }
+  body { margin: 0 auto; max-width: 880px; padding: 32px 16px; background: var(--bg); color: var(--fg);
+         font-family: "Source Han Sans JP", sans-serif; line-height: 1.7; }
+  h1 { font-weight: 700; margin: 0 0 8px; }
+  p.lead { color: var(--muted); margin: 0 0 32px; }
+  .row { border-top: 1px solid var(--line); padding: 16px 0; }
+  .row small { color: var(--muted); font-family: ui-monospace, monospace; }
+  .row div { font-size: clamp(20px, 5vw, 32px); overflow-wrap: anywhere; }
+  pre { background: var(--code); padding: 12px; overflow-x: auto; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>源ノ角ゴシック JP</h1>
+<p class="lead">Source Han Sans JP — 表示中の文字に必要な分だけを読み込む分割 WOFF2 配信</p>
+<div id="rows"></div>
+<h2>使い方</h2>
+<pre id="usage"></pre>
+<p><a href="LICENSE.txt">SIL Open Font License 1.1</a></p>
+<script>
+  const weights = [[200, "ExtraLight"], [300, "Light"], [350, "Normal"], [400, "Regular"],
+                   [500, "Medium"], [700, "Bold"], [900, "Heavy"]];
+  const sample = "あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら。Aa 0123";
+  document.getElementById("rows").innerHTML = weights.map(([w, name]) =>
+    `<div class="row"><small>${w} ${name}</small><div style="font-weight:${w}">${sample}</div></div>`
+  ).join("");
+  const css = new URL("source-han-sans-jp.css", location.href).href;
+  document.getElementById("usage").textContent =
+    `<link rel="stylesheet" href="${css}">\n\nbody { font-family: "Source Han Sans JP", sans-serif; }`;
+</script>
+</body>
+</html>
