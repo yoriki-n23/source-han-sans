@@ -53,6 +53,8 @@
 
 2026-09-29 時点で、`master` は `c857d04` のまま変化なし。Cloudflare Pages のチェックも success のまま。
 
+**2026-09-29 再確認の結果**：`curl -sI https://source-han-sans.pages.dev/` は、今回のセッションでも 403 だった（プロキシが CONNECT を拒否しており、ネットワークポリシーによる遮断）。そのため、ユーザーに「Network access に追加する」か「スクリーンショットを貼る」かを依頼中。
+
 確認手順の案：
 
 1. ネットワーク許可があるか確かめる：`curl -sI https://source-han-sans.pages.dev/`
