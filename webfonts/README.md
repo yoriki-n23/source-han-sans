@@ -1,6 +1,10 @@
-# 源ノ角ゴシック JP Webフォント（Cloudflare Pages 配信）
+# Kaku Sans JP Webフォント（Cloudflare Pages 配信）
 
-`cidfont.ps.JP` から日本語サブセット OTF（7ウェイト）をビルドし、`unicode-range` で分割した WOFF2 と CSS を Cloudflare Pages へデプロイします。
+`cidfont.ps.JP` から源ノ角ゴシック JP（Source Han Sans JP）の日本語サブセット OTF（7ウェイト）をビルドし、`unicode-range` で分割した WOFF2 と CSS を Cloudflare Pages へデプロイします。
+
+## フォント名について
+
+源ノ角ゴシックは SIL Open Font License 1.1 で、"Source" が予約フォント名（Reserved Font Name）です。サブセット化や分割をしたフォントは OFL の「改変版」にあたり、予約フォント名を使えません。そのため `split.py` は、配信用のフォントの名前を **Kaku Sans JP** に変えています（name テーブルと CFF の名前。日本語の名前「源ノ角ゴシック」も削除）。著作権表示とライセンスの記録はそのまま残し、`LICENSE.txt` も一緒に配信します。名前を変える場合は、`split.py` の `FAMILY` と `CSS_FILE` を書き換えてください。
 
 - 分割順：基本文字・かな → JIS 第1水準漢字 → 第2水準 → その他（1ウェイト28ファイル、最大でも約250KB）
 - ページ上の文字に必要なファイルだけがブラウザに読み込まれます
@@ -32,15 +36,11 @@ Cloudflare ダッシュボード › Workers & Pages › 作成 › Pages › Gi
 
 以後、`master` に push するたびに自動でデプロイされ、`https://source-han-sans.pages.dev/` で公開されます。
 
-### 予備：GitHub Actions（手動実行）
-
-Git 連携が使えない場合は、`CLOUDFLARE_API_TOKEN`（権限は Account › Cloudflare Pages › Edit のみ）と `CLOUDFLARE_ACCOUNT_ID` を GitHub の Settings › Secrets and variables › Actions に登録し、Actions タブから「Deploy web fonts to Cloudflare Pages」を手動実行します。
-
 ## 使い方
 
 ```html
-<link rel="stylesheet" href="https://source-han-sans.pages.dev/source-han-sans-jp.css">
-<style>body { font-family: "Source Han Sans JP", sans-serif; }</style>
+<link rel="stylesheet" href="https://source-han-sans.pages.dev/kaku-sans-jp.css">
+<style>body { font-family: "Kaku Sans JP", sans-serif; }</style>
 ```
 
 `font-weight` は 200 / 300 / 350 / 400 / 500 / 700 / 900 に対応しています。

@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Split Source Han Sans JP OTFs into unicode-range WOFF2 chunks plus a CSS file.
 
+The chunks are a Modified Version under the SIL OFL, and "Source" is a Reserved
+Font Name, so every chunk is renamed to FAMILY. Copyright and license records
+are kept unchanged.
+
 Browsers only download the chunks whose unicode-range matches characters on
 the page, so a typical Japanese page loads a few hundred KB instead of the
 whole font. Every chunk stays far below Cloudflare Pages' 25 MiB file limit.
@@ -15,7 +19,9 @@ from concurrent.futures import ProcessPoolExecutor
 from fontTools import subset
 from fontTools.ttLib import TTFont
 
-FAMILY = "Source Han Sans JP"
+FAMILY = "Kaku Sans JP"
+PS_FAMILY = FAMILY.replace(" ", "")
+CSS_FILE = "kaku-sans-jp.css"
 WEIGHTS = {
     "ExtraLight": 200,
     "Light": 300,
@@ -83,6 +89,28 @@ def unicode_range(cps):
     return ", ".join(ranges)
 
 
+def rename(font):
+    """Replace the Reserved Font Name in every name the font presents to users."""
+    name = font["name"]
+    for rec in list(name.names):
+        if rec.nameID not in (1, 2, 3, 4, 6, 16, 17):
+            continue
+        if rec.langID != 0x409:  # localized names (源ノ角ゴシック) would keep the old name
+            name.removeNames(nameID=rec.nameID, langID=rec.langID)
+            continue
+        value = rec.toUnicode().replace(";ADBO;", ";").replace(";ADOBE", "")
+        value = value.replace("Source Han Sans JP", FAMILY).replace("SourceHanSansJP", PS_FAMILY)
+        rec.string = value
+    cff = font["CFF "].cff
+    cff.fontNames[0] = cff.fontNames[0].replace("SourceHanSansJP", PS_FAMILY)
+    top = cff.topDictIndex[0]
+    top.FamilyName = top.FamilyName.replace("Source Han Sans JP", FAMILY)
+    top.FullName = top.FullName.replace("Source Han Sans JP", FAMILY)
+    for fd in getattr(top, "FDArray", []):
+        if hasattr(fd, "FontName"):
+            fd.FontName = fd.FontName.replace("SourceHanSansJP", PS_FAMILY)
+
+
 def build_chunk(job):
     otf, out, cps = job
     opts = subset.Options()
@@ -95,6 +123,7 @@ def build_chunk(job):
     subsetter = subset.Subsetter(opts)
     subsetter.populate(unicodes=cps)
     subsetter.subset(font)
+    rename(font)
     subset.save_font(font, out, opts)
     return os.path.getsize(out)
 
@@ -109,7 +138,7 @@ def main(otf_dir, site_dir):
         version = f"{font['head'].fontRevision:.3f}"
         chunks = plan_chunks(font.getBestCmap().keys())
         font.close()
-        rel_dir = f"fonts/v{version}/{weight}"
+        rel_dir = f"fonts/{PS_FAMILY}/v{version}/{weight}"
         os.makedirs(os.path.join(site_dir, rel_dir), exist_ok=True)
         for i, cps in enumerate(chunks):
             rel = f"{rel_dir}/{i:03d}.woff2"
@@ -130,8 +159,9 @@ def main(otf_dir, site_dir):
     with ProcessPoolExecutor() as pool:
         total = sum(pool.map(build_chunk, jobs))
 
-    with open(os.path.join(site_dir, "source-han-sans-jp.css"), "w") as f:
-        f.write("/* Source Han Sans JP - SIL Open Font License 1.1, see LICENSE.txt */\n")
+    with open(os.path.join(site_dir, CSS_FILE), "w") as f:
+        f.write(f"/* {FAMILY} - modified from Source Han Sans JP (Adobe). "
+                "SIL Open Font License 1.1, see LICENSE.txt */\n")
         f.write("\n".join(css))
     print(f"wrote {len(jobs)} WOFF2 chunks ({total / 1024 / 1024:.1f} MiB) to {site_dir}")
 

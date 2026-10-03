@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build Source Han Sans JP web fonts into dist/site for Cloudflare Pages.
+# Build Source Han Sans JP into the renamed "Kaku Sans JP" web fonts in dist/site
+# for Cloudflare Pages (see split.py for why the family is renamed).
 # Requires: pip install -r webfonts/requirements.txt
 set -euo pipefail
 
